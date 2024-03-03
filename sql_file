@@ -1,0 +1,45 @@
+-- Question 1. Write an SQL query to find the names of restaurants that have at least one menu item with a price greater than $10.
+
+SELECT
+	restaurant_info.name 
+FROM restaurant_info
+LEFT JOIN menuitems
+ON restaurant_info.restaurant_id = menuitems.restaurant_id
+WHERE price IN (SELECT MAX(price)
+		FROM menuitems
+        GROUP BY restaurant_id)
+
+-- Question 2. Write an SQL query to retrieve the user names and their corresponding orders where the order total is greater than the average order total for all users.
+
+SELECT 
+	user_info.name, AVG(orders.total_amount) AS Average_total_amont
+FROM user_info
+LEFT JOIN orders
+ON user_info.ID = orders.user_id
+WHERE total_amount > (SELECT
+							AVG(orders.total_amount) AS Average_total_amont
+						FROM orders )
+GROUP BY user_info.name  
+-- Question 3. Write an SQL query to list the names of users whose last names start with 'S' or ends with ‘e’.
+
+SELECT
+	user_info.name
+FROM user_info
+WHERE name LIKE 'S%' OR '%e';
+
+-- Question 4. Write an SQL query to find the total order amounts for each restaurant. If a restaurant has no orders, display the restaurant name and a total amount of 0. Use the COALESCE function to handle null values
+
+SELECT
+	restaurant_info.name, SUM(COALESCE(orders.total_amount,0)) AS Total_Order
+FROM restaurant_info
+LEFT JOIN orders
+ON restaurant_info.restaurant_id = orders.restaurant_id
+GROUP BY restaurant_info.name
+-- Question 5. Write a query to find out how many orders were placed using cash or credit.
+
+SELECT
+	payment_type.name, COUNT(payment_transactions.order_id) AS Number_of_Orders
+FROM payment_transactions
+LEFT JOIN payment_type
+ON payment_transactions.pay_type_id = payment_type.pay_type_id
+GROUP BY payment_type.name
